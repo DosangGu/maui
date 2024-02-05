@@ -56,22 +56,36 @@ namespace Microsoft.Maui.Graphics
 			IShape? shape = ShapeView?.Shape;
 
 			if (shape == null)
+
+/* Unmerged change from project 'Core(net8.0-ios)'
+Before:
+				return;
+After:
+			{
+				return;
+			}
+*/
+			{
+			{
 				return;
 
-			PathF? path = shape.PathForBounds(rect);
+/* Unmerged change from project 'Core(net8.0-ios)'
+Before:
+			ApplyTransform(path);
 
-			if (path == null)
-				return;
+			DrawStrokePath(canvas, rect, path);
+			DrawFillPath(canvas, rect, path);
+After:
+			}
 
 			ApplyTransform(path);
 
 			DrawStrokePath(canvas, rect, path);
 			DrawFillPath(canvas, rect, path);
-		}
+*/
 
-		void DrawStrokePath(ICanvas canvas, RectF dirtyRect, PathF path)
-		{
-			if (ShapeView == null || ShapeView.Shape == null || ShapeView.StrokeThickness <= 0 || ShapeView.Stroke == null)
+/* Unmerged change from project 'Core(net8.0-ios)'
+Before:
 				return;
 
 			canvas.SaveState();
@@ -94,7 +108,20 @@ namespace Microsoft.Maui.Graphics
 			// Set StrokeLineJoin
 			var strokeLineJoin = ShapeView.StrokeLineJoin;
 			canvas.StrokeLineJoin = strokeLineJoin;
+After:
+			{
+				return;
+			}
 
+			canvas.SaveState();
+
+			// Set StrokeThickness
+			float strokeThickness = (float)ShapeView.StrokeThickness;
+			canvas.StrokeSize = strokeThickness;
+*/
+
+/* Unmerged change from project 'Core(net8.0-ios)'
+Before:
 			// Set StrokeDashPattern
 			var strokeDashPattern = ShapeView.StrokeDashPattern;
 			canvas.StrokeDashPattern = strokeDashPattern;
@@ -143,6 +170,174 @@ namespace Microsoft.Maui.Graphics
 		{
 			if (RenderTransform == null)
 				return;
+After:
+			// Set Stroke
+			var stroke = ShapeView.Stroke;
+
+			// TODO: Add Paint support for Stroke in Microsoft.Maui.Graphics.
+			// For now, only support a solid color.
+			canvas.StrokeColor = stroke.ToColor();
+
+			// Set StrokeLineCap
+			var strokeLineCap = ShapeView.StrokeLineCap;
+			canvas.StrokeLineCap = strokeLineCap;
+
+			// Set StrokeLineJoin
+			var strokeLineJoin = ShapeView.StrokeLineJoin;
+			canvas.StrokeLineJoin = strokeLineJoin;
+
+			// Set StrokeDashPattern
+			var strokeDashPattern = ShapeView.StrokeDashPattern;
+			canvas.StrokeDashPattern = strokeDashPattern;
+
+			// Set StrokeDashOffset	
+			var strokeDashOffset = ShapeView.StrokeDashOffset;
+			canvas.StrokeDashOffset = strokeDashOffset;
+
+			// Set StrokeMiterLimit
+			var strokeMiterLimit = ShapeView.StrokeMiterLimit;
+			canvas.MiterLimit = strokeMiterLimit;
+
+			canvas.DrawPath(path);
+
+			canvas.RestoreState();
+		}
+
+		void DrawFillPath(ICanvas canvas, RectF dirtyRect, PathF path)
+		{
+			if (ShapeView == null || ShapeView.Shape == null)
+			{
+				return;
+			}
+
+			canvas.SaveState();
+
+			canvas.FillColor = Colors.Transparent;
+
+			ClipPath(canvas, path);
+
+			// Set Fill
+			var fillPaint = ShapeView.Fill ?? ShapeView.Background;
+
+			if (fillPaint != null)
+			{
+				canvas.SetFillPaint(fillPaint, dirtyRect);
+			}
+
+			canvas.FillPath(path);
+
+			canvas.RestoreState();
+		}
+
+		void ClipPath(ICanvas canvas, PathF path)
+		{
+			canvas.ClipPath(path, WindingMode);
+		}
+
+		void ApplyTransform(PathF path)
+		{
+			if (RenderTransform == null)
+			{
+				return;
+			}
+*/
+			}
+
+			PathF? path = shape.PathForBounds(rect);
+
+			if (path == null)
+			{
+				return;
+			}
+
+			ApplyTransform(path);
+
+			DrawStrokePath(canvas, rect, path);
+			DrawFillPath(canvas, rect, path);
+		}
+
+		void DrawStrokePath(ICanvas canvas, RectF dirtyRect, PathF path)
+		{
+			if (ShapeView == null || ShapeView.Shape == null || ShapeView.StrokeThickness <= 0 || ShapeView.Stroke == null)
+			{
+				return;
+			}
+
+			canvas.SaveState();
+
+			// Set StrokeThickness
+			float strokeThickness = (float)ShapeView.StrokeThickness;
+			canvas.StrokeSize = strokeThickness;
+
+			// Set Stroke
+			var stroke = ShapeView.Stroke;
+
+			// TODO: Add Paint support for Stroke in Microsoft.Maui.Graphics.
+			// For now, only support a solid color.
+			canvas.StrokeColor = stroke.ToColor();
+
+			// Set StrokeLineCap
+			var strokeLineCap = ShapeView.StrokeLineCap;
+			canvas.StrokeLineCap = strokeLineCap;
+
+			// Set StrokeLineJoin
+			var strokeLineJoin = ShapeView.StrokeLineJoin;
+			canvas.StrokeLineJoin = strokeLineJoin;
+
+			// Set StrokeDashPattern
+			var strokeDashPattern = ShapeView.StrokeDashPattern;
+			canvas.StrokeDashPattern = strokeDashPattern;
+
+			// Set StrokeDashOffset	
+			var strokeDashOffset = ShapeView.StrokeDashOffset;
+			canvas.StrokeDashOffset = strokeDashOffset;
+
+			// Set StrokeMiterLimit
+			var strokeMiterLimit = ShapeView.StrokeMiterLimit;
+			canvas.MiterLimit = strokeMiterLimit;
+
+			canvas.DrawPath(path);
+
+			canvas.RestoreState();
+		}
+
+		void DrawFillPath(ICanvas canvas, RectF dirtyRect, PathF path)
+		{
+			if (ShapeView == null || ShapeView.Shape == null)
+			{
+				return;
+			}
+
+			canvas.SaveState();
+
+			canvas.FillColor = Colors.Transparent;
+
+			ClipPath(canvas, path);
+
+			// Set Fill
+			var fillPaint = ShapeView.Fill ?? ShapeView.Background;
+
+			if (fillPaint != null)
+			{
+				canvas.SetFillPaint(fillPaint, dirtyRect);
+			}
+
+			canvas.FillPath(path);
+
+			canvas.RestoreState();
+		}
+
+		void ClipPath(ICanvas canvas, PathF path)
+		{
+			canvas.ClipPath(path, WindingMode);
+		}
+
+		void ApplyTransform(PathF path)
+		{
+			if (RenderTransform == null)
+			{
+				return;
+			}
 
 			path.Transform(RenderTransform.Value);
 		}

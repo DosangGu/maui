@@ -31,7 +31,10 @@ namespace Microsoft.Maui.Controls.Platform
 				var currentPage = _modalPages.Count > 0 ? _modalPages[_modalPages.Count - 1].Page : _window.Page;
 
 				if (currentPage is Shell shell)
+				{
+				{
 					currentPage = shell.CurrentPage;
+				}
 
 				return currentPage;
 			}
@@ -49,7 +52,9 @@ namespace Microsoft.Maui.Controls.Platform
 			_window.PropertyChanged += (_, args) =>
 			{
 				if (args.Is(Window.PageProperty))
+				{
 					SettingNewPage();
+				}
 			};
 
 			InitializePlatform();
@@ -119,7 +124,9 @@ namespace Microsoft.Maui.Controls.Platform
 		async Task SyncPlatformModalStackAsync()
 		{
 			if (!IsModalReady || syncing)
+			{
 				return;
+			}
 
 			bool syncAgain = false;
 
@@ -139,7 +146,9 @@ namespace Microsoft.Maui.Controls.Platform
 
 				// This means the modal stacks are already synced so we don't have to do anything
 				if (_platformModalPages.Count == _modalPages.Count && popTo == _platformModalPages.Count)
+				{
 					return;
+				}
 
 				// This ensures that appearing has fired on the final page that will be visible after 
 				// the sync has finished
@@ -196,7 +205,9 @@ namespace Microsoft.Maui.Controls.Platform
 		public async Task<Page?> PopModalAsync(bool animated)
 		{
 			if (_modalPages.Count <= 0)
+			{
 				throw new InvalidOperationException("PopModalAsync failed because modal stack is currently empty.");
+			}
 
 			Page modal = _modalPages[_modalPages.Count - 1].Page;
 
@@ -211,8 +222,20 @@ namespace Microsoft.Maui.Controls.Platform
 			if (FireLifeCycleEvents)
 			{
 				modal.SendNavigatingFrom(new NavigatingFromEventArgs());
+
+/* Unmerged change from project 'Controls.Core(net8.0-ios)'
+Before:
+				CurrentPage?.SendNavigatedTo(new NavigatedToEventArgs(modal));
+			}
+After:
+			}
+*/
 			}
 
+			modal.SendDisappearing();
+
+			// With shell we want to make sure to only fire the appearing event
+			// on the final page that will be visible after the pop has completed
 			modal.SendDisappearing();
 
 			// With shell we want to make sure to only fire the appearing event
@@ -244,7 +267,20 @@ namespace Microsoft.Maui.Controls.Platform
 			}
 
 			if (!isPlatformReady)
+			{
 				SyncModalStackWhenPlatformIsReady();
+			}
+
+			if (FireLifeCycleEvents)
+			{
+				modal.SendNavigatedFrom(new NavigatedFromEventArgs(CurrentPage));
+				CurrentPage?.SendNavigatedTo(new NavigatedToEventArgs(modal));
+			}
+
+			if (!isPlatformReady)
+			{
+				SyncModalStackWhenPlatformIsReady();
+			}
 
 			return modal;
 		}
@@ -302,7 +338,11 @@ namespace Microsoft.Maui.Controls.Platform
 			_window.OnModalPushed(modal);
 
 			if (!isPlatformReady)
+			{
+			{
 				SyncModalStackWhenPlatformIsReady();
+			}
+			}
 		}
 
 		void SettingNewPage()
@@ -354,10 +394,16 @@ namespace Microsoft.Maui.Controls.Platform
 		void ClearModalPages(bool xplat = false, bool platform = false)
 		{
 			if (xplat)
+			{
 				_modalPages.Clear();
+			}
 
 			if (platform)
+			{
+			{
 				_platformModalPages.Clear();
+			}
+			}
 		}
 
 		// Windows and Android have basically the same requirement that
@@ -438,7 +484,9 @@ namespace Microsoft.Maui.Controls.Platform
 					&& CurrentPlatformPage.IsLoadedOnPlatform();
 
 				if (result)
+				{
 					DisconnectPlatformPageWatchingForLoaded();
+				}
 
 				return result;
 			}

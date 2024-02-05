@@ -75,7 +75,10 @@ namespace Microsoft.Maui.DeviceTests
 				{
 					var n = GetNativeText(h);
 					if (string.IsNullOrEmpty(n))
+					{
 						n = null; // Native platforms may not support null text
+					}
+
 					return n;
 				},
 				setValue,

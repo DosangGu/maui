@@ -14,7 +14,9 @@ namespace Microsoft.Maui.Graphics.Text
 			if (attributes != null)
 			{
 				if (attributes.TryGetValue(type, out var value))
+				{
 					return value;
+				}
 			}
 
 			return defaultValue;
@@ -28,9 +30,13 @@ namespace Microsoft.Maui.Graphics.Text
 			if (attributes != null)
 			{
 				if (value == null)
+				{
 					attributes.Remove(type);
+				}
 				else
+				{
 					attributes[type] = value;
+				}
 			}
 		}
 
@@ -50,7 +56,9 @@ namespace Microsoft.Maui.Graphics.Text
 			if (value != null)
 			{
 				if (int.TryParse(value, out var intValue))
+				{
 					return intValue;
+				}
 			}
 
 			return defaultValue;
@@ -63,9 +71,23 @@ namespace Microsoft.Maui.Graphics.Text
 			int defaultValue)
 		{
 			if (value == defaultValue)
+
+/* Unmerged change from project 'Graphics(net8.0-ios)'
+Before:
 				attributes.RemoveAttribute(type);
+After:
+			{
+				attributes.RemoveAttribute(type);
+			}
+*/
+			{
+				attributes.RemoveAttribute(type);
+			}
 			else
+			{
+			{
 				attributes.SetAttribute(type, value.ToString(CultureInfo.InvariantCulture));
+			}
 		}
 
 		public static float GetFloatAttribute(
@@ -77,7 +99,9 @@ namespace Microsoft.Maui.Graphics.Text
 			if (value != null)
 			{
 				if (float.TryParse(value, out var floatValue))
+				{
 					return floatValue;
+				}
 			}
 
 			return defaultValue;
@@ -91,10 +115,26 @@ namespace Microsoft.Maui.Graphics.Text
 		{
 #pragma warning disable RECS0018 // Comparison of floating point numbers with equality operator
 			if (value == defaultValue)
+
+/* Unmerged change from project 'Graphics(net8.0-ios)'
+Before:
 #pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
 				attributes.RemoveAttribute(type);
+After:
+			{
+#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
+				attributes.RemoveAttribute(type);
+			}
+*/
+			{
+#pragma warning restore RECS0018 // Comparison of floating point numbers with equality operator
+				attributes.RemoveAttribute(type);
+			}
 			else
+			{
+			{
 				attributes.SetAttribute(type, value.ToString(CultureInfo.InvariantCulture));
+			}
 		}
 
 		public static bool GetBoolAttribute(
@@ -106,7 +146,9 @@ namespace Microsoft.Maui.Graphics.Text
 			if (value != null)
 			{
 				if (bool.TryParse(value, out var boolValue))
+				{
 					return boolValue;
+				}
 			}
 
 			return defaultValue;
@@ -119,9 +161,23 @@ namespace Microsoft.Maui.Graphics.Text
 			bool defaultValue = false)
 		{
 			if (value == defaultValue)
+
+/* Unmerged change from project 'Graphics(net8.0-ios)'
+Before:
 				attributes.RemoveAttribute(type);
+After:
+			{
+				attributes.RemoveAttribute(type);
+			}
+*/
+			{
+				attributes.RemoveAttribute(type);
+			}
 			else
+			{
+			{
 				attributes.SetAttribute(type, value.ToString());
+			}
 		}
 
 		public static T GetEnumAttribute<T>(
@@ -133,7 +189,9 @@ namespace Microsoft.Maui.Graphics.Text
 			if (value != null)
 			{
 				if (Enum.TryParse(value, out T enumValue))
+				{
 					return enumValue;
+				}
 			}
 
 			return defaultValue;
@@ -146,9 +204,23 @@ namespace Microsoft.Maui.Graphics.Text
 			T defaultValue) where T : struct
 		{
 			if (Equals(value, defaultValue))
+
+/* Unmerged change from project 'Graphics(net8.0-ios)'
+Before:
 				attributes.RemoveAttribute(type);
+After:
+			{
+				attributes.RemoveAttribute(type);
+			}
+*/
+			{
+				attributes.RemoveAttribute(type);
+			}
 			else
+			{
+			{
 				attributes.SetAttribute(type, value.ToString());
+			}
 		}
 	}
 }

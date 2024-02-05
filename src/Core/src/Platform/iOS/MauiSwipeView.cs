@@ -76,10 +76,14 @@ namespace Microsoft.Maui.Platform
 			base.LayoutSubviews();
 
 			if (Bounds.X < 0 || Bounds.Y < 0)
+			{
 				Bounds = new CGRect(0, 0, Bounds.Width, Bounds.Height);
+			}
 
 			if (_contentView != null && _contentView.Frame.IsEmpty)
+			{
 				_contentView.Frame = Bounds;
+			}
 		}
 
 		public override void TouchesEnded(NSSet touches, UIEvent? evt)
@@ -98,7 +102,9 @@ namespace Microsoft.Maui.Platform
 			var navigationController = GetUINavigationController(GetViewController());
 
 			if (navigationController != null)
+			{
 				navigationController.InteractivePopGestureRecognizer.Enabled = true;
+			}
 
 			if (touches.AnyObject is UITouch anyObject)
 			{
@@ -112,7 +118,9 @@ namespace Microsoft.Maui.Platform
 		public override UIView HitTest(CGPoint point, UIEvent? uievent)
 		{
 			if (!UserInteractionEnabled || Hidden)
+			{
 				return null!;
+			}
 
 			foreach (var subview in Subviews)
 			{
@@ -121,7 +129,9 @@ namespace Microsoft.Maui.Platform
 					var view = HitTest(subview, point, uievent);
 
 					if (view != null)
+					{
 						return view;
+					}
 				}
 			}
 
@@ -131,7 +141,9 @@ namespace Microsoft.Maui.Platform
 		UIView? HitTest(UIView view, CGPoint point, UIEvent? uievent)
 		{
 			if (view.Subviews == null)
+			{
 				return null;
+			}
 
 			foreach (var subview in view.Subviews)
 			{
@@ -157,7 +169,9 @@ namespace Microsoft.Maui.Platform
 			if (swipeView?.PresentedContent is IView view)
 			{
 				if (Subviews.Length > 0)
+				{
 					_contentView = Subviews[0];
+				}
 
 				_contentView = view.ToPlatform(mauiContext);
 			}
@@ -169,7 +183,9 @@ namespace Microsoft.Maui.Platform
 			AddSubview(_contentView);
 
 			if (_contentView != null)
+			{
 				BringSubviewToFront(_contentView);
+			}
 		}
 
 		class SwipeRecognizerProxy
@@ -186,25 +202,35 @@ namespace Microsoft.Maui.Platform
 			public void HandleTap(UITapGestureRecognizer recognizer)
 			{
 				if (!_view.TryGetTarget(out var view))
+				{
 					return;
+				}
 
 				if (view._isSwiping)
+				{
 					return;
+				}
 
 				var state = recognizer.State;
 				if (state != UIGestureRecognizerState.Cancelled)
 				{
 					if (view._contentView == null)
+					{
 						return;
+					}
 
 					var point = recognizer.LocationInView(view);
 
 					if (view._isOpen)
 					{
 						if (!view.TouchInsideContent(point))
+						{
 							view.ProcessTouchSwipeItems(point);
+						}
 						else
+						{
 							view.ResetSwipe();
+						}
 					}
 				}
 			}
@@ -212,7 +238,9 @@ namespace Microsoft.Maui.Platform
 			public void HandlePan(UIPanGestureRecognizer panGestureRecognizer)
 			{
 				if (!_view.TryGetTarget(out var view))
+				{
 					return;
+				}
 
 				if (view._isSwipeEnabled && panGestureRecognizer != null)
 				{
@@ -223,7 +251,9 @@ namespace Microsoft.Maui.Platform
 					{
 						case UIGestureRecognizerState.Began:
 							if (navigationController != null)
+							{
 								navigationController.InteractivePopGestureRecognizer.Enabled = false;
+							}
 
 							view.HandleTouchInteractions(GestureStatus.Started, point);
 							break;
@@ -232,13 +262,17 @@ namespace Microsoft.Maui.Platform
 							break;
 						case UIGestureRecognizerState.Ended:
 							if (navigationController != null)
+							{
 								navigationController.InteractivePopGestureRecognizer.Enabled = true;
+							}
 
 							view.HandleTouchInteractions(GestureStatus.Completed, point);
 							break;
 						case UIGestureRecognizerState.Cancelled:
 							if (navigationController != null)
+							{
 								navigationController.InteractivePopGestureRecognizer.Enabled = true;
+							}
 
 							view.HandleTouchInteractions(GestureStatus.Canceled, point);
 							break;
@@ -282,13 +316,20 @@ namespace Microsoft.Maui.Platform
 		void UpdateSwipeItems()
 		{
 			if (_contentView == null || Element?.Handler?.MauiContext == null)
+
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Before:
 				return;
 
 			ISwipeItems? items = Element.GetSwipeItemsByDirection(_swipeDirection);
 
 			if (items == null || items.Count == 0)
-				return;
-
+After:
+			{
+*/
+			
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Before:
 			_swipeItemsRect = new List<CGRect>();
 
 			double swipeItemsWidth;
@@ -297,6 +338,44 @@ namespace Microsoft.Maui.Platform
 				swipeItemsWidth = items.Count * SwipeViewExtensions.SwipeItemWidth;
 			else
 				swipeItemsWidth = _contentView.Frame.Width;
+
+			_actionView = new UIStackView
+			{
+				Axis = UILayoutConstraintAxis.Horizontal,
+				Frame = new CGRect(0, 0, swipeItemsWidth, _contentView.Frame.Height)
+			};
+
+			foreach (var item in items)
+After:
+			}
+
+			ISwipeItems? items = Element.GetSwipeItemsByDirection(_swipeDirection);
+
+			if (items == null || items.Count == 0)
+*/
+{
+				return;
+			}
+
+			ISwipeItems? items = Element.GetSwipeItemsByDirection(_swipeDirection);
+
+			if (items == null || items.Count == 0)
+			{
+				return;
+			}
+
+			_swipeItemsRect = new List<CGRect>();
+
+			double swipeItemsWidth;
+
+			if (_swipeDirection == SwipeDirection.Left || _swipeDirection == SwipeDirection.Right)
+			{
+				swipeItemsWidth = items.Count * SwipeViewExtensions.SwipeItemWidth;
+			}
+			else
+			{
+				swipeItemsWidth = _contentView.Frame.Width;
+			}
 
 			_actionView = new UIStackView
 			{
@@ -320,6 +399,9 @@ namespace Microsoft.Maui.Platform
 		void LayoutSwipeItems(List<UIView> childs)
 		{
 			if (_actionView == null || childs == null || Element == null)
+
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Before:
 				return;
 
 			_swipeItemsRect.Clear();
@@ -327,10 +409,31 @@ namespace Microsoft.Maui.Platform
 			var items = GetSwipeItemsByDirection();
 
 			if (items == null || items.Count == 0)
+After:
+			{
+*/
+			{
 				return;
+			}
+
+			_swipeItemsRect.Clear();
+
+			var items = GetSwipeItemsByDirection();
+			}
+
+			_swipeItemsRect.Clear();
+
+			var items = GetSwipeItemsByDirection();
+
+			if (items == null || items.Count == 0)
+			{
+				return;
+			}
 
 			if (_originalBounds == CGRect.Empty)
+			{
 				_originalBounds = _contentView.Frame;
+			}
 
 			int i = 0;
 			float previousWidth = 0;
@@ -379,7 +482,9 @@ namespace Microsoft.Maui.Platform
 			var swipeItems = new List<UIView>();
 
 			foreach (var view in _actionView.Subviews)
+			{
 				swipeItems.Add(view);
+			}
 
 			return swipeItems;
 		}
@@ -387,7 +492,9 @@ namespace Microsoft.Maui.Platform
 		internal void UpdateIsVisibleSwipeItem(ISwipeItem item)
 		{
 			if (!_isOpen)
+			{
 				return;
+			}
 
 			if (item?.Handler?.PlatformView is UIView platformView)
 			{
@@ -405,7 +512,9 @@ namespace Microsoft.Maui.Platform
 		static void UpdateSwipeItemInsets(UIButton button, float spacing = 0.0f)
 		{
 			if (button.ImageView?.Image == null)
+			{
 				return;
+			}
 
 			button.ContentMode = UIViewContentMode.Center;
 			button.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
@@ -451,10 +560,14 @@ namespace Microsoft.Maui.Platform
 		void ProcessTouchDown(CGPoint point)
 		{
 			if (_isSwiping || _isTouchDown || _contentView == null)
+			{
 				return;
+			}
 
 			if (TouchInsideContent(point) && _isOpen)
+			{
 				ResetSwipe();
+			}
 
 			_initialPoint = point;
 			_isTouchDown = true;
@@ -463,6 +576,9 @@ namespace Microsoft.Maui.Platform
 		void ProcessTouchMove(CGPoint point)
 		{
 			if (_contentView == null || !TouchInsideContent(point))
+
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Before:
 				return;
 
 			if (!_isOpen)
@@ -481,7 +597,40 @@ namespace Microsoft.Maui.Platform
 			}
 
 			if (!ValidateSwipeDirection() || _isResettingSwipe)
+After:
+			{
+*/
+			
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Before:
+			_swipeOffset = GetSwipeOffset(_initialPoint, point);
+			UpdateIsOpen(_swipeOffset != 0);
+After:
+			}
+*/
+{
 				return;
+			}
+
+			if (!_isOpen)
+			{
+				ResetSwipeToInitialPosition();
+
+				_swipeDirection = SwipeDirectionHelper.GetSwipeDirection(new Point(_initialPoint.X, _initialPoint.Y), new Point(point.X, point.Y));
+
+				UpdateSwipeItems();
+			}
+
+			if (!_isSwiping)
+			{
+				RaiseSwipeStarted();
+				_isSwiping = true;
+			}
+
+			if (!ValidateSwipeDirection() || _isResettingSwipe)
+			{
+				return;
+			}
 
 			_swipeOffset = GetSwipeOffset(_initialPoint, point);
 			UpdateIsOpen(_swipeOffset != 0);
@@ -500,6 +649,9 @@ namespace Microsoft.Maui.Platform
 			_isTouchDown = false;
 
 			if (!_isSwiping)
+
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Before:
 				return;
 
 			_isSwiping = false;
@@ -508,7 +660,37 @@ namespace Microsoft.Maui.Platform
 			RaiseSwipeEnded();
 
 			if (_isResettingSwipe || !ValidateSwipeDirection())
+After:
+			{
+*/
+			{
 				return;
+			}
+
+			_isSwiping = false;
+			IsParentScrollEnabled(true);
+
+			RaiseSwipeEnded();
+
+			if (_isResettingSwipe || !ValidateSwipeDirection())
+			{
+				return;
+
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Added:
+			}
+
+			_isSwiping = false;
+			IsParentScrollEnabled(true);
+
+			RaiseSwipeEnded();
+
+			if (_isResettingSwipe || !ValidateSwipeDirection())
+			{
+				return;
+			}
+*/
+			}
 
 			ValidateSwipeThreshold();
 		}
@@ -518,23 +700,46 @@ namespace Microsoft.Maui.Platform
 			var swipeThresholdPercent = MinimumOpenSwipeThresholdPercentage * GetSwipeThreshold();
 
 			if (Math.Abs(_swipeOffset) < swipeThresholdPercent)
+
+/* Unmerged change from project 'Core(net8.0-maccatalyst)'
+Before:
 				return;
 
 			if (scrollEnabled == _isScrollEnabled)
+After:
+			{
+*/
+			{
 				return;
+			}
+
+			if (scrollEnabled == _isScrollEnabled)
+			{
+				return;
+			}
+			}
+
+			if (scrollEnabled == _isScrollEnabled)
+			{
+				return;
+			}
 
 			_isScrollEnabled = scrollEnabled;
 
 			var parent = this.GetParentOfType<UIScrollView>();
 
 			if (parent != null)
+			{
 				parent.ScrollEnabled = _isScrollEnabled;
+			}
 		}
 
 		bool TouchInsideContent(CGPoint point)
 		{
 			if (_contentView == null)
+			{
 				return false;
+			}
 
 			return _contentView.Frame.Contains(point);
 		}
@@ -542,7 +747,9 @@ namespace Microsoft.Maui.Platform
 		ISwipeItems? GetSwipeItemsByDirection()
 		{
 			if (_swipeDirection.HasValue)
+			{
 				return GetSwipeItemsByDirection(_swipeDirection.Value);
+			}
 
 			return null;
 		}
@@ -573,7 +780,9 @@ namespace Microsoft.Maui.Platform
 		void Swipe(bool animated = false)
 		{
 			if (_contentView == null || Element == null)
+			{
 				return;
+			}
 
 			var offset = ValidateSwipeOffset(_swipeOffset);
 			_isOpen = offset != 0;
@@ -643,43 +852,71 @@ namespace Microsoft.Maui.Platform
 			{
 				case SwipeDirection.Left:
 					if (offset > 0)
+					{
 						offset = 0;
+					}
 
 					if (_isResettingSwipe && offset < 0)
+					{
 						offset = 0;
+					}
 
 					if (Math.Abs(offset) > swipeThreshold)
+					{
 						return -swipeThreshold;
+					}
+
 					break;
 				case SwipeDirection.Right:
 					if (offset < 0)
+					{
 						offset = 0;
+					}
 
 					if (_isResettingSwipe && offset > 0)
+					{
 						offset = 0;
+					}
 
 					if (Math.Abs(offset) > swipeThreshold)
+					{
 						return swipeThreshold;
+					}
+
 					break;
 				case SwipeDirection.Up:
 					if (offset > 0)
+					{
 						offset = 0;
+					}
 
 					if (_isResettingSwipe && offset < 0)
+					{
 						offset = 0;
+					}
 
 					if (Math.Abs(offset) > swipeThreshold)
+					{
 						return -swipeThreshold;
+					}
+
 					break;
 				case SwipeDirection.Down:
 					if (offset < 0)
+					{
 						offset = 0;
+					}
 
 					if (_isResettingSwipe && offset > 0)
+					{
 						offset = 0;
+					}
 
 					if (Math.Abs(offset) > swipeThreshold)
+					{
 						return swipeThreshold;
+					}
+
 					break;
 			}
 
@@ -719,7 +956,9 @@ namespace Microsoft.Maui.Platform
 		internal void ResetSwipe(bool animated = true)
 		{
 			if (_swipeItemsRect == null || _contentView == null)
+			{
 				return;
+			}
 
 			_isResettingSwipe = true;
 			_isSwiping = false;
@@ -731,7 +970,9 @@ namespace Microsoft.Maui.Platform
 				Animate(SwipeAnimationDuration, 0.0, UIViewAnimationOptions.CurveEaseOut, () =>
 				{
 					if (_originalBounds != CGRect.Empty)
+					{
 						_contentView.Frame = new CGRect(_originalBounds.X, _originalBounds.Y, _originalBounds.Width, _originalBounds.Height);
+					}
 				},
 				() =>
 				{
@@ -742,7 +983,9 @@ namespace Microsoft.Maui.Platform
 			else
 			{
 				if (_originalBounds != CGRect.Empty)
+				{
 					_contentView.Frame = new CGRect(_originalBounds.X, _originalBounds.Y, _originalBounds.Width, _originalBounds.Height);
+				}
 
 				DisposeSwipeItems();
 				_isResettingSwipe = false;
@@ -752,7 +995,9 @@ namespace Microsoft.Maui.Platform
 		void ValidateSwipeThreshold()
 		{
 			if (_swipeDirection == null)
+			{
 				return;
+			}
 
 			var swipeThresholdPercent = OpenSwipeThresholdPercentage * GetSwipeThreshold();
 
@@ -761,30 +1006,42 @@ namespace Microsoft.Maui.Platform
 				var swipeItems = GetSwipeItemsByDirection();
 
 				if (swipeItems == null)
+				{
 					return;
+				}
 
 				if (swipeItems.Mode == SwipeMode.Execute)
 				{
 					foreach (var swipeItem in swipeItems)
 					{
 						if (GetIsVisible(swipeItem))
+						{
 							MauiSwipeView.ExecuteSwipeItem(swipeItem);
+						}
 					}
 
 					if (swipeItems.SwipeBehaviorOnInvoked != SwipeBehaviorOnInvoked.RemainOpen)
+					{
 						ResetSwipe();
+					}
 				}
 				else
+				{
 					SwipeToThreshold();
+				}
 			}
 			else
+			{
 				ResetSwipe();
+			}
 		}
 
 		void SwipeToThreshold(bool animated = true)
 		{
 			if (Element == null)
+			{
 				return;
+			}
 
 			var completeAnimationDuration = animated ? SwipeAnimationDuration : 0;
 
@@ -862,9 +1119,13 @@ namespace Microsoft.Maui.Platform
 		static bool GetIsVisible(ISwipeItem swipeItem)
 		{
 			if (swipeItem is IView view)
+			{
 				return view.Visibility == Maui.Visibility.Visible;
+			}
 			else if (swipeItem is ISwipeItemMenuItem menuItem)
+			{
 				return menuItem.Visibility == Maui.Visibility.Visible;
+			}
 
 			return true;
 		}
@@ -872,12 +1133,16 @@ namespace Microsoft.Maui.Platform
 		double GetSwipeThreshold()
 		{
 			if (Math.Abs(_swipeThreshold) > double.Epsilon)
+			{
 				return _swipeThreshold;
+			}
 
 			var swipeItems = GetSwipeItemsByDirection();
 
 			if (swipeItems == null)
+			{
 				return 0;
+			}
 
 			_swipeThreshold = GetSwipeThreshold(swipeItems);
 
@@ -887,12 +1152,16 @@ namespace Microsoft.Maui.Platform
 		double GetSwipeThreshold(ISwipeItems swipeItems)
 		{
 			if (Element == null)
+			{
 				return default(double);
+			}
 
 			var threshold = Element.Threshold;
 
 			if (threshold > 0)
+			{
 				return threshold;
+			}
 
 			double swipeThreshold = 0;
 			bool isHorizontal = IsHorizontalSwipe();
@@ -911,10 +1180,14 @@ namespace Microsoft.Maui.Platform
 					}
 				}
 				else
+				{
 					swipeThreshold = Element.GetSwipeItemHeight(_swipeDirection, _contentView);
+				}
 			}
 			else
+			{
 				swipeThreshold = CalculateSwipeThreshold();
+			}
 
 			return ValidateSwipeThreshold(swipeThreshold);
 		}
@@ -923,7 +1196,9 @@ namespace Microsoft.Maui.Platform
 		{
 			var swipeItems = GetSwipeItemsByDirection();
 			if (swipeItems == null || Element == null)
+			{
 				return SwipeViewExtensions.SwipeThreshold;
+			}
 
 			float swipeItemsHeight = 0;
 			float swipeItemsWidth = 0;
@@ -932,7 +1207,9 @@ namespace Microsoft.Maui.Platform
 			foreach (var swipeItem in swipeItems)
 			{
 				if (swipeItem is ISwipeItemView)
+				{
 					useSwipeItemsSize = true;
+				}
 
 				if (GetIsVisible(swipeItem))
 				{
@@ -969,13 +1246,17 @@ namespace Microsoft.Maui.Platform
 			if (IsHorizontalSwipe())
 			{
 				if (swipeThreshold > swipeFrame.Width)
+				{
 					swipeThreshold = swipeFrame.Width;
+				}
 
 				return swipeThreshold;
 			}
 
 			if (swipeThreshold > swipeFrame.Height)
+			{
 				swipeThreshold = swipeFrame.Height;
+			}
 
 			return swipeThreshold;
 		}
@@ -983,7 +1264,9 @@ namespace Microsoft.Maui.Platform
 		bool ValidateSwipeDirection()
 		{
 			if (_swipeDirection == null)
+			{
 				return false;
+			}
 
 			var swipeItems = GetSwipeItemsByDirection();
 			return MauiSwipeView.IsValidSwipeItems(swipeItems);
@@ -1011,12 +1294,16 @@ namespace Microsoft.Maui.Platform
 		void ProcessTouchSwipeItems(CGPoint point)
 		{
 			if (_isResettingSwipe)
+			{
 				return;
+			}
 
 			var swipeItems = GetSwipeItemsByDirection();
 
 			if (swipeItems == null || _swipeItemsRect == null)
+			{
 				return;
+			}
 
 			int i = 0;
 
@@ -1034,7 +1321,9 @@ namespace Microsoft.Maui.Platform
 						MauiSwipeView.ExecuteSwipeItem(swipeItem);
 
 						if (swipeItems.SwipeBehaviorOnInvoked != SwipeBehaviorOnInvoked.RemainOpen)
+						{
 							ResetSwipe();
+						}
 
 						break;
 					}
@@ -1052,7 +1341,9 @@ namespace Microsoft.Maui.Platform
 			var viewController = window.RootViewController;
 
 			while (viewController?.PresentedViewController != null)
+			{
 				viewController = viewController.PresentedViewController;
+			}
 
 			return viewController;
 		}
@@ -1088,24 +1379,34 @@ namespace Microsoft.Maui.Platform
 		static void ExecuteSwipeItem(ISwipeItem item)
 		{
 			if (item == null)
+			{
 				return;
+			}
 
 			bool isEnabled = true;
 
 			if (item is ISwipeItemMenuItem swipeItem)
+			{
 				isEnabled = swipeItem.IsEnabled;
+			}
 
 			if (item is ISwipeItemView swipeItemView)
+			{
 				isEnabled = swipeItemView.IsEnabled;
+			}
 
 			if (isEnabled)
+			{
 				item.OnInvoked();
+			}
 		}
 
 		void UpdateIsOpen(bool isOpen)
 		{
 			if (Element == null)
+			{
 				return;
+			}
 
 			Element.IsOpen = isOpen;
 		}
@@ -1115,7 +1416,9 @@ namespace Microsoft.Maui.Platform
 			if (_isOpen)
 			{
 				if (_previousOpenSwipeItem == openSwipeItem)
+				{
 					return;
+				}
 
 				ResetSwipe(false);
 			}
@@ -1141,7 +1444,9 @@ namespace Microsoft.Maui.Platform
 			var swipeItems = GetSwipeItemsByDirection();
 
 			if (swipeItems is null || !swipeItems.Any(GetIsVisible))
+			{
 				return;
+			}
 
 			UpdateIsOpen(true);
 
@@ -1172,7 +1477,9 @@ namespace Microsoft.Maui.Platform
 		void RaiseSwipeStarted()
 		{
 			if (_swipeDirection == null || !ValidateSwipeDirection())
+			{
 				return;
+			}
 
 			Element?.SwipeStarted(new SwipeViewSwipeStarted(_swipeDirection.Value));
 		}
@@ -1180,7 +1487,9 @@ namespace Microsoft.Maui.Platform
 		void RaiseSwipeChanging()
 		{
 			if (_swipeDirection == null)
+			{
 				return;
+			}
 
 			Element?.SwipeChanging(new SwipeViewSwipeChanging(_swipeDirection.Value, _swipeOffset));
 		}
@@ -1188,14 +1497,20 @@ namespace Microsoft.Maui.Platform
 		void RaiseSwipeEnded()
 		{
 			if (_swipeDirection == null || !ValidateSwipeDirection())
+			{
 				return;
+			}
 
 			bool isOpen = false;
 
 			var swipeThresholdPercent = OpenSwipeThresholdPercentage * GetSwipeThreshold();
 
+			var swipeThresholdPercent = OpenSwipeThresholdPercentage * GetSwipeThreshold();
+
 			if (Math.Abs(_swipeOffset) >= swipeThresholdPercent)
+			{
 				isOpen = true;
+			}
 
 			Element?.SwipeEnded(new SwipeViewSwipeEnded(_swipeDirection.Value, isOpen));
 		}

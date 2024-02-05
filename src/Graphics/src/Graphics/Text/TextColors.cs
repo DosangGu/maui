@@ -153,13 +153,36 @@ namespace Microsoft.Maui.Graphics.Text
 		public static float[] Parse(this string color)
 		{
 			if (string.IsNullOrEmpty(color))
+			{
 				return null;
 
+/* Unmerged change from project 'Graphics(net8.0-ios)'
+Before:
 			//Remove # if present
 			if (!color.StartsWith("#", StringComparison.Ordinal))
 			{
 				if (!StandardColors.TryGetValue(color, out color))
 					return null;
+After:
+			}
+
+			//Remove # if present
+			if (!color.StartsWith("#", StringComparison.Ordinal))
+			{
+				if (!StandardColors.TryGetValue(color, out color))
+				{
+					return null;
+				}
+*/
+			}
+
+			//Remove # if present
+			if (!color.StartsWith("#", StringComparison.Ordinal))
+			{
+				if (!StandardColors.TryGetValue(color, out color))
+				{
+					return null;
+				}
 			}
 
 			int red = 0;
@@ -196,13 +219,36 @@ namespace Microsoft.Maui.Graphics.Text
 		public static int[] ParseAsInts(this string color)
 		{
 			if (string.IsNullOrEmpty(color))
+			{
 				return null;
 
+/* Unmerged change from project 'Graphics(net8.0-ios)'
+Before:
 			//Remove # if present
 			if (!color.StartsWith("#", StringComparison.Ordinal))
 			{
 				if (!StandardColors.TryGetValue(color.ToUpperInvariant(), out color))
 					return null;
+After:
+			}
+
+			//Remove # if present
+			if (!color.StartsWith("#", StringComparison.Ordinal))
+			{
+				if (!StandardColors.TryGetValue(color.ToUpperInvariant(), out color))
+				{
+					return null;
+				}
+*/
+			}
+
+			//Remove # if present
+			if (!color.StartsWith("#", StringComparison.Ordinal))
+			{
+				if (!StandardColors.TryGetValue(color.ToUpperInvariant(), out color))
+				{
+					return null;
+				}
 			}
 
 			int red = 0;
